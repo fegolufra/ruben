@@ -259,12 +259,12 @@ async function emitirFactura(saleId, paymentMethod) {
    const subTotal = sale.total;
    const discountAmt = sale.discount || 0;
    const totalReal = sale.total + discountAmt;
-   db.run("INSERT INTO invoices (sale_id, invoice_type, invoice_letter, invoice_number, cae, cae_vto, result, client_id, client_name, client_cuit, client_iva, total, iva_total, subtotal, discount, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+   await db.run("INSERT INTO invoices (sale_id, invoice_type, invoice_letter, invoice_number, cae, cae_vto, result, client_id, client_name, client_cuit, client_iva, total, iva_total, subtotal, discount, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
      [saleId, needsLegalInvoice && cae ? 'legal' : 'interna', invoiceLetter, invoiceNumber, cae, caeVto, result, sale.client_id || null, sale.client_name || 'General', sale.client_cuit || '', sale.client_iva || '', sale.total, 0, subTotal, discountAmt, paymentMethod]);
 
   const invoiceId = lastId();
   for (const item of items) {
-    db.run("INSERT INTO invoice_items (invoice_id, product_name, quantity, price, subtotal, description, iva_aliquot, iva_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    await db.run("INSERT INTO invoice_items (invoice_id, product_name, quantity, price, subtotal, description, iva_aliquot, iva_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [invoiceId, item.product_name, item.quantity, item.price, item.subtotal, item.description || '', 21, 0]);
   }
 
@@ -314,11 +314,11 @@ async function emitirFacturaDePago(paymentId) {
     invoiceNumber = generateInternalInvoiceNumber();
   }
 
-  db.run("INSERT INTO invoices (sale_id, invoice_type, invoice_letter, invoice_number, cae, cae_vto, result, client_id, client_name, client_cuit, client_iva, total, iva_total, subtotal, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  await db.run("INSERT INTO invoices (sale_id, invoice_type, invoice_letter, invoice_number, cae, cae_vto, result, client_id, client_name, client_cuit, client_iva, total, iva_total, subtotal, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [null, legal && cae ? 'legal' : 'interna', invoiceLetter, invoiceNumber, cae, caeVto, result, payment.client_id || null, payment.client_name || 'General', payment.client_cuit || '', payment.client_iva || '', payment.amount, 0, payment.amount, payment.payment_method || 'efectivo']);
 
   const invoiceId = lastId();
-  db.run("INSERT INTO invoice_items (invoice_id, product_name, quantity, price, subtotal, iva_aliquot, iva_amount) VALUES (?, ?, ?, ?, ?, ?)",
+  await db.run("INSERT INTO invoice_items (invoice_id, product_name, quantity, price, subtotal, iva_aliquot, iva_amount) VALUES (?, ?, ?, ?, ?, ?)",
     [invoiceId, payment.notes || 'Pago de cuenta corriente', 1, payment.amount, payment.amount, legal ? getIvaAliquot(invoiceLetter) : 0, 0]);
 
   saveDb();
