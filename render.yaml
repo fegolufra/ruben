@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sistema-pos
+    env: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    ports:
+      - port: 3000
+        env: PORT
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+    healthcheckPath: /api/version
+    autoDeploy: true
+    branch: master

@@ -1,0 +1,24 @@
+name: sistema-pos
+image: node:18-alpine
+run:
+  cmd: ["node", "server.js"]
+  working_dir: /app
+services:
+  - name: sistema-pos
+    image:
+      name: sistema-pos
+      registry: docker.io
+    routes:
+      - path: /
+        port: 3000
+    scale:
+      min: 1
+      max: 1
+      cpu: 1000
+      memory: 1024
+    volumes:
+      - name: sistema-pos-data
+        size: 1
+    env:
+      PORT: "3000"
+      NODE_ENV: "production"

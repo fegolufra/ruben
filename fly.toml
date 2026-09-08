@@ -1,0 +1,15 @@
+app = "sistema-pos"
+primary_region = "iad"
+
+[http_service]
+  internal_port = 3000
+  ports = [
+    { port = 80, handlers = ["http"] },
+    { port = 443, handlers = ["tls", "http"] }
+  ]
+  protocols = ["http"]
+  force_https = true
+
+[env]
+  PORT = "3000"
+  NODE_ENV = "production"
