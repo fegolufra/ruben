@@ -274,9 +274,7 @@ async function initDatabase() {
   if (usernames.indexOf('ruben') === -1) {
     db.run("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)", ['ruben', bcrypt.hashSync('ruben123', 10), 'Ruben', 'admin']);
   }
-  if (usernames.indexOf('jorge') === -1) {
-    db.run("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)", ['jorge', bcrypt.hashSync('jorge123', 10), 'Jorge', 'operator']);
-  }
+  db.run("INSERT OR REPLACE INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)", ['jorge', bcrypt.hashSync('jorge123', 10), 'Jorge', 'operator']);
   db.run("UPDATE users SET password=? WHERE username='admin'", [bcrypt.hashSync('admin', 10)]);
   db.run("UPDATE users SET password=? WHERE username='ruben'", [bcrypt.hashSync('ruben123', 10)]);
   db.run("UPDATE users SET password=? WHERE username='jorge'", [bcrypt.hashSync('jorge123', 10)]);
