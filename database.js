@@ -48,10 +48,28 @@ async function initDatabase() {
   try { db.run("ALTER TABLE invoices ADD COLUMN subtotal REAL NOT NULL DEFAULT 0"); } catch (e) {}
   try { db.run("ALTER TABLE invoices ADD COLUMN payment_method TEXT DEFAULT ''"); } catch (e) {}
   try { db.run("ALTER TABLE invoices ADD COLUMN invoice_letter TEXT DEFAULT ''"); } catch (e) {}
+
+function initUsers() {
+  const users = [
+    { username: 'admin', password: 'admin', full_name: 'Administrador', role: 'admin' },
+    { username: 'ruben', password: 'ruben123', full_name: 'Ruben', role: 'operator' },
+    { username: 'jorge', password: 'jorge123', full_name: 'Jorge', role: 'vendedor' },
+  ];
+  users.forEach(u => {
+    const existing = queryOne("SELECT id FROM users WHERE username = ?", [u.username]);
+    if (!existing) {
+      const hash = bcrypt.hashSync(u.password, 10);
+      db.run("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)", [u.username, hash, u.full_name, u.role]);
+    } else {
+      db.run("UPDATE users SET password = ?, full_name = ?, role = ? WHERE username = ?", [bcrypt.hashSync(u.password, 10), u.full_name, u.role, u.username]);
+    }
+  });
+  saveDb();
 }
+initUsers();
 
 function getDb() { return db; }
-function saveDb() {}
+function saveDb() { if (db) { const data = db.export(); fs.writeFileSync(DB_PATH, Buffer.from(data)); } }
 function queryAll(sql, params) { return db.prepare(sql).all(params || []); }
 function queryOne(sql, params) { return db.prepare(sql).get(params || []) || null; }
 function lastId() { return db.prepare("SELECT last_insert_rowid() as id").get().id; }

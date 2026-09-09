@@ -18,8 +18,10 @@ function auth(req, res, next) {
   if (!token) return res.status(401).json({ error: 'Token requerido' });
   try {
     req.user = jwt.verify(token, SECRET);
-    if (req.user.role === 'operator') {
-      var allowedPaths = ['/api/products','/api/expenses','/api/categories','/api/suppliers','/api/clients','/api/purchases','/api/sales','/api/quotes','/api/payments','/api/invoices','/api/backups','/api/sync','/api/me','/api/dashboard','/api/version'];
+    if (req.user.role === 'operator' || req.user.role === 'vendedor') {
+      var allowedPaths = req.user.role === 'operator'
+        ? ['/api/products','/api/expenses','/api/categories','/api/suppliers','/api/clients','/api/purchases','/api/sales','/api/quotes','/api/payments','/api/invoices','/api/backups','/api/sync','/api/me','/api/dashboard','/api/version']
+        : ['/api/clients','/api/sales','/api/quotes','/api/payments','/api/me','/api/dashboard','/api/version'];
       if (!allowedPaths.some(function(p) { return req.path.startsWith(p); })) {
         return res.status(403).json({ error: 'Acceso denegado para este usuario' });
       }
