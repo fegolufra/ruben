@@ -1,9 +1,10 @@
 services:
   - type: web
     name: sistema-pos
-    env: docker
+    env: node
     plan: free
-    dockerfilePath: Dockerfile
+    buildCommand: "npm install"
+    startCommand: "node server.js"
     ports:
       - port: 3000
         env: PORT
