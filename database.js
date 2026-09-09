@@ -43,6 +43,15 @@ try { db.exec("ALTER TABLE invoices ADD COLUMN subtotal REAL NOT NULL DEFAULT 0"
 try { db.exec("ALTER TABLE invoices ADD COLUMN payment_method TEXT DEFAULT ''"); } catch (e) {}
 try { db.exec("ALTER TABLE invoices ADD COLUMN invoice_letter TEXT DEFAULT ''"); } catch (e) {}
 
+const userCount = db.prepare("SELECT COUNT(*) as c FROM users").get().c;
+if (userCount === 0) {
+  db.close();
+  try { fs.copyFileSync(path.join(__dirname, 'sistema_pos.db.backup'), DB_PATH); } catch (e) {}
+  db = new Database(DB_PATH);
+  db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
+}
+
 function initUsers() {
   const users = [
     { username: 'admin', password: 'admin', full_name: 'Administrador', role: 'admin' },
