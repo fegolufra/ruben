@@ -341,7 +341,7 @@ app.post('/api/quotes', auth, (req, res) => {
     const subtotal = item.quantity * item.price;
     db.run("INSERT INTO quote_items (quote_id, product_id, product_name, quantity, price, subtotal, description) VALUES (?, ?, ?, ?, ?, ?, ?)", [quoteId, item.product_id || null, item.product_name, item.quantity, item.price, subtotal, item.description || '']);
   }
-  saveDb();
+  try { saveDb(); } catch (e) {}
   res.json({ success: true, id: quoteId });
 });
 

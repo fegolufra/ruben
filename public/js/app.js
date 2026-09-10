@@ -1322,15 +1322,15 @@ async function printTicket(id) {
       itemsHtml += '<tr><td>' + escHtml(sale.items[i].product_name) + desc + '</td><td class="r">' + sale.items[i].quantity + '</td><td class="r">$' + Number(sale.items[i].price).toFixed(2) + '</td><td class="r">$' + Number(sale.items[i].subtotal).toFixed(2) + '</td></tr>';
     }
   }
-  printHtml('<html><head><title>Ticket #' + sale.id + '</title>' +
-    '<style>body{font-family:monospace;font-size:12px;margin:0;padding:12px 16px;max-width:300px}*{box-sizing:border-box}table{width:100%;border-collapse:collapse}th,td{padding:3px 0;text-align:left}.r{text-align:right}.line{border-top:1px dashed #000;margin:8px 0}.total{font-weight:700;font-size:14px}.footer{text-align:center;margin-top:10px;font-size:10px;color:#666;border-top:1px dashed #000;padding-top:8px}.info{font-size:11px;line-height:1.5;margin:0}</style></head><body>' +
+printHtml('<html><head><title>Ticket #' + sale.id + '</title>' +
+    '<style>@page{size:A4;margin:0}html,body{margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#000}.sheet{width:210mm;height:296mm;padding:10mm 14mm;box-sizing:border-box;display:flex;flex-direction:column}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:8px}.line{border-top:1px dashed #000;margin:8px 0}.total{font-weight:700;font-size:14px}.footer{text-align:center;margin-top:10px;font-size:10px;color:#666;border-top:1px dashed #000;padding-top:8px}.info{font-size:11px;line-height:1.5;margin:0}table{width:100%;border-collapse:collapse}th,td{padding:4px 0;text-align:left}.r{text-align:right}</style></head><body>' +
     ticketHeader() +
     '<p class="info"><strong>Ticket #' + sale.id + '</strong><br>Fecha: ' + (sale.created_at || '') + '<br>Vendedor: ' + (sale.user_name || '-') + '<br>Cliente: ' + (sale.client_name || 'General') + '<br>Pago: ' + fmtPay(sale.payment_method) + '</p>' +
     '<div class="line"></div><table><tr><th>Producto</th><th class="r">Cant</th><th class="r">Precio</th><th class="r">Subtotal</th></tr>' + itemsHtml + '</table>' +
-     '<div class="line"></div>' +
-     '<p style="display:flex;justify-content:space-between"><span>Valor Total Real:</span><span>$' + (Number(sale.total) + Number(sale.discount || 0)).toFixed(2) + '</span></p>' +
-     (sale.discount > 0 ? '<p style="display:flex;justify-content:space-between"><span>Descuento:</span><span>-$' + Number(sale.discount).toFixed(2) + '</span></p>' : '') +
-     '<p class="total" style="display:flex;justify-content:space-between"><span>Valor con Descuento / TOTAL:</span><span>$' + Number(sale.total).toFixed(2) + '</span></p>' +
+      '<div class="line"></div>' +
+      '<p style="display:flex;justify-content:space-between"><span>Valor Total Real:</span><span>$' + (Number(sale.total) + Number(sale.discount || 0)).toFixed(2) + '</span></p>' +
+      (sale.discount > 0 ? '<p style="display:flex;justify-content:space-between"><span>Descuento:</span><span>-$' + Number(sale.discount).toFixed(2) + '</span></p>' : '') +
+      '<p class="total" style="display:flex;justify-content:space-between"><span>Valor con Descuento / TOTAL:</span><span>$' + Number(sale.total).toFixed(2) + '</span></p>' +
     '<div class="footer">Gracias por su compra</div></body></html>');
 }
 
