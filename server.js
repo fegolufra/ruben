@@ -560,20 +560,16 @@ app.get('/api/dashboard', auth, (req, res) => {
   const today = new Date().toISOString().split('T')[0];
   const stats = {};
 
-  const r1 = db.exec("SELECT COUNT(*) as c FROM products WHERE active=1");
-  stats.total_products = r1[0]?.values[0][0] || 0;
-
-  const r2 = db.exec("SELECT COUNT(*) as c FROM products WHERE active=1 AND stock <= min_stock AND min_stock > 0");
-  stats.low_stock = r2[0]?.values[0][0] || 0;
-
+  stats.total_products = queryOne("SELECT COUNT(*) as c FROM products WHERE active=1")?.c || 0;
+  stats.low_stock = queryOne("SELECT COUNT(*) as c FROM products WHERE active=1 AND stock <= min_stock AND min_stock > 0")?.c || 0;
   stats.total_suppliers = queryOne("SELECT COUNT(*) as c FROM suppliers")?.c || 0;
   stats.total_clients = queryOne("SELECT COUNT(*) as c FROM clients")?.c || 0;
   stats.today_sales = queryOne("SELECT COUNT(*) as c FROM sales WHERE DATE(created_at) = ?", [today])?.c || 0;
   stats.today_revenue = queryOne("SELECT COALESCE(SUM(total), 0) as s FROM sales WHERE DATE(created_at) = ?", [today])?.s || 0;
   stats.month_revenue = queryOne("SELECT COALESCE(SUM(total), 0) as s FROM sales WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')")?.s || 0;
-   stats.sales_chart = queryAll("SELECT DATE(created_at) as day, SUM(total) as total FROM sales WHERE created_at >= DATE('now', '-7 days') GROUP BY DATE(created_at) ORDER BY day");
-   stats.top_products = queryAll("SELECT p.name, SUM(si.quantity) as q FROM sale_items si JOIN products p ON si.product_id = p.id GROUP BY si.product_id ORDER BY q DESC LIMIT 5");
-   stats.payments_summary = queryAll("SELECT payment_method, COUNT(*) as count, SUM(total) as total FROM sales WHERE created_at >= DATE('now', '-7 days') GROUP BY payment_method ORDER BY total DESC");
+  stats.sales_chart = queryAll("SELECT DATE(created_at) as day, SUM(total) as total FROM sales WHERE created_at >= DATE('now', '-7 days') GROUP BY DATE(created_at) ORDER BY day");
+  stats.top_products = queryAll("SELECT p.name, SUM(si.quantity) as q FROM sale_items si JOIN products p ON si.product_id = p.id GROUP BY si.product_id ORDER BY q DESC LIMIT 5");
+  stats.payments_summary = queryAll("SELECT payment_method, COUNT(*) as count, SUM(total) as total FROM sales WHERE created_at >= DATE('now', '-7 days') GROUP BY payment_method ORDER BY total DESC");
 
   res.json(stats);
 });
