@@ -1003,7 +1003,8 @@ function escJs(s) {
 
 async function initPOS() {
   saleCart = [];
-  var clients = await api('GET', '/clients') || [];
+  try { var clients = await api('GET', '/clients') || [];
+  } catch (e) { var clients = []; }
   var csel = document.getElementById('vs_client');
   for (var i = 0; i < clients.length; i++) {
     var o = document.createElement('option');
