@@ -961,8 +961,10 @@ var saleCart = [];
   async function searchSaleProduct() {
     var q = document.getElementById('vs_search').value.trim();
     if (!q) { document.getElementById('vs_results').innerHTML = ''; return; }
-    var products = await api('GET', '/products?search=' + encodeURIComponent(q)) || [];
-    lastSearchResults = products;
+    try {
+      var products = await api('GET', '/products?search=' + encodeURIComponent(q)) || [];
+      lastSearchResults = products;
+    } catch (e) { lastSearchResults = []; }
     renderSearchResults();
   }
 
@@ -1023,7 +1025,7 @@ async function quickSale() {
   var stockWarnings = [];
   for (var i = 0; i < saleCart.length; i++) {
     var item = saleCart[i];
-    var p = await api('GET', '/products/' + item.product_id);
+    var p = await api('GET', '/products/' + item.product_id).catch(function() { return null; });
     if (p && item.qty > p.stock && p.stock >= 0) stockWarnings.push(item.name + ' (disp: ' + p.stock + ')');
   }
     // Mostrar confirmacion con detalle y descuento
