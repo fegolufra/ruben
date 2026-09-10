@@ -62,7 +62,7 @@ function applyRoleVisibility(role) {
   } else if (role === 'operator') {
     allowed = ['pos','products','categories','suppliers','clients','purchases','sales','quotes','payments','expenses','invoices','backups'];
   } else {
-    allowed = ['dashboard','pos','products','categories','suppliers','clients','purchases','sales','quotes','payments','expenses','invoices','reports'];
+    allowed = ['pos','products','categories','suppliers','clients','purchases','sales','quotes','payments','expenses','invoices','reports'];
   }
   var navs = document.querySelectorAll('.sidebar-nav .nav-item');
   for (var i = 0; i < navs.length; i++) {
