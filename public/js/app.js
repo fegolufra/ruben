@@ -39,10 +39,10 @@ async function doLogin() {
     document.getElementById('app').classList.add('active');
     document.getElementById('userName').textContent = user.full_name || user.username;
     document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : user.role === 'operator' ? 'Operador' : 'Vendedor';
-    applyRoleVisibility(user.role);
-    applyCompactPref();
-    watchTables();
-    navigate('dashboard');
+applyRoleVisibility(user.role);
+     applyCompactPref();
+     watchTables();
+     navigate(user.role === 'admin' ? 'dashboard' : 'pos');
   } catch (e) { err.style.display = 'block'; }
 }
 
@@ -117,7 +117,7 @@ async function checkForUpdates() {
         document.getElementById('userName').textContent = user.full_name || user.username;
         document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : user.role === 'operator' ? 'Operador' : 'Vendedor';
         applyRoleVisibility(user.role);
-        navigate('dashboard');
+        navigate(user.role === 'admin' ? 'dashboard' : 'pos');
       }
     });
   }
