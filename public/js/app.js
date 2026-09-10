@@ -856,7 +856,7 @@ var saleCart = [];
      '<h3 style="margin-bottom:1rem;color:var(--text)">Buscar Producto</h3>' +
      '<div style="display:flex;gap:.5rem;margin-bottom:.75rem;align-items:flex-end">' +
      '<div class="form-group" style="margin-bottom:0"><label>Descuento %</label><input id="vsDiscount" type="number" step="0.01" value="0" min="0" placeholder="0" oninput="renderSearchResults()" style="width:120px;padding:8px;border:2px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)"></div>' +
-     '<input class="search-input" id="vs_search" placeholder="Buscar por codigo, descripcion 1 o descripcion 2..." style="flex:1" oninput="renderSearchResults()">' +
+     '<input class="search-input" id="vs_search" placeholder="Buscar por codigo, descripcion 1 o descripcion 2..." style="flex:1" oninput="searchSaleProduct()">' +
      '<button class="btn btn-primary" onclick="searchSaleProduct()">Buscar</button>' +
      '</div>' +
      '<div id="vs_results" style="margin-top:.75rem;max-height:200px;overflow-y:auto"></div>' +
