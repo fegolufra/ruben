@@ -1463,7 +1463,7 @@ async function loadQuotes() {
 }
 
 function showQuoteForm() {
-  var quoteCart = [];
+  window.quoteCart = [];
   openModal('Nueva Cotizacion',
     '<div class="form-group"><label>Cliente</label><select id="qtClient" class="w-full"><option value="">Sin cliente</option></select></div>' +
     '<hr style="margin:1rem 0;border:none;border-top:1px solid var(--border)">' +
