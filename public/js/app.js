@@ -1523,9 +1523,9 @@ function showQuoteForm() {
         descSel.appendChild(o);
       });
     }
-  });
+  }).catch(function() {});
 
-  window.quoteCart = quoteCart;
+  // window.quoteCart ya fue inicializado arriba como window.quoteCart = [];
 }
 
 function addQuoteItem() {
