@@ -1,4 +1,6 @@
 const express = require('express');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 500 * 1024 * 1024 } });
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -206,55 +208,6 @@ app.delete('/api/products/:id', auth, (req, res) => {
   db.run("UPDATE products SET active=0 WHERE id=?", [req.params.id]);
   saveDb();
   res.json({ success: true });
-});
-
-app.post('/api/import/prices', auth, adminOnly, (req, res) => {
-  const { prices } = req.body;
-  if (!prices) return res.status(400).json({ error: 'Falta lista de precios' });
-  const db = getDb();
-  let updated = 0, notFound = [], errors = [];
-  for (const code of Object.keys(prices)) {
-    const entry = prices[code];
-    const cost = parseFloat(entry.cost) || 0;
-    const price = parseFloat(entry.price) || 0;
-    const exists = queryOne("SELECT id FROM products WHERE barcode=? AND active=1", [code]);
-    if (!exists) { if (code) notFound.push(code); continue; }
-    db.run("UPDATE products SET cost=?, price=?, updated_at=CURRENT_TIMESTAMP WHERE barcode=?", [cost, price, code]);
-    updated++;
-  }
-  saveDb();
-  res.json({ success: true, updated, notFound: notFound.length });
-});
-
-app.post('/api/import/prices-csv', auth, adminOnly, upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Falta archivo CSV' });
-  const content = req.file.buffer.toString('utf8');
-  const lines = content.trim().split('\n');
-  const prices = {};
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split('\t').length > 1 ? lines[i].split('\t') : lines[i].split(',');
-    if (cols.length >= 10) {
-      const code = cols[0].trim();
-      const costStr = cols[7] ? cols[7].toString().replace('.', '').replace(',', '.').trim() : '';
-      const priceStr = cols[9] ? cols[9].toString().replace('.', '').replace(',', '.').trim() : '';
-      const cost = parseFloat(costStr) || 0;
-      const price = parseFloat(priceStr) || 0;
-      if (code && !isNaN(parseInt(code))) {
-        prices[code] = { cost, price };
-      }
-    }
-  }
-  const db = getDb();
-  let updated = 0, notFound = [];
-  for (const code of Object.keys(prices)) {
-    const entry = prices[code];
-    const exists = queryOne("SELECT id FROM products WHERE barcode=? AND active=1", [code]);
-    if (!exists) { if (code) notFound.push(code); continue; }
-    db.run("UPDATE products SET cost=?, price=?, updated_at=CURRENT_TIMESTAMP WHERE barcode=?", [entry.cost, entry.price, code]);
-    updated++;
-  }
-  saveDb();
-  res.json({ success: true, updated, notFound: notFound.length });
 });
 
 app.post('/api/import/products', auth, adminOnly, (req, res) => {
@@ -732,8 +685,6 @@ app.post('/api/sync/import', auth, adminOnly, (req, res) => {
   }).on('error', (e) => res.status(500).json({ error: 'Error de conexion: ' + e.message }));
 });
 
-const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 500 * 1024 * 1024 } });
 app.post('/api/sync/import-local', auth, adminOnly, upload.single('db'), (req, res) => {
   const dbPath = require('./database').DB_PATH;
   if (!req.file) return res.status(400).json({ error: 'Archivo no recibido' });
