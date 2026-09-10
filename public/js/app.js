@@ -535,6 +535,32 @@ function exportProducts() {
   showAlert('Descargando inventario...');
 }
 
+function showProductImport() {
+  openModal('Importar Precios CSV',
+    '<p style="margin-bottom:1rem">Subi un CSV con los precios de compra y valor de venta por metro. Debe tener CODIGO en la primer columna.</p>' +
+    '<input type="file" id="csvFile" accept=".csv,.txt" style="width:100%;padding:8px;border:2px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)">' +
+    '<div style="margin-top:1rem"><button class="btn btn-primary" onclick="doImportPrices()">Cargar Precios</button></div>',
+    null,
+    '<button class="btn btn-outline" onclick="closeModal()">Cancelar</button>');
+}
+
+async function doImportPrices() {
+  var fileInput = document.getElementById('csvFile');
+  if (!fileInput.files.length) return showAlert('Seleccione un archivo', 'danger');
+  var formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  try {
+    var res = await fetch('/api/import/prices-csv', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+      body: formData
+    });
+    var data = await res.json();
+    if (data.success) showAlert('Precios cargados: ' + data.updated + ' actualizados, ' + data.notFound + ' no encontrados');
+    else showAlert(data.error || 'Error', 'danger');
+  } catch (e) { showAlert('Error de conexión', 'danger'); }
+}
+
 // ==================== CATEGORIES ====================
 function viewCategories() {
   return '<div class="toolbar"><div class="spacer"></div><button class="btn btn-primary" onclick="showCategoryForm()">+ Nueva Categoria</button></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Descripcion</th><th class="text-right">Acciones</th></tr></thead><tbody id="categoriesTable"></tbody></table></div></div>';
