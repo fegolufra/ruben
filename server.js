@@ -212,17 +212,66 @@ app.post('/api/import/prices', auth, adminOnly, (req, res) => {
   const { prices } = req.body;
   if (!prices) return res.status(400).json({ error: 'Falta lista de precios' });
   const db = getDb();
-  let updated = 0, notFound = [];
+  let updated = 0, notFound = [], errors = [];
   for (const code of Object.keys(prices)) {
-    const price = parseFloat(prices[code]);
-    if (isNaN(price) || price <= 0) continue;
+    const entry = prices[code];
+    const cost = parseFloat(entry.cost) || 0;
+    const price = parseFloat(entry.price) || 0;
     const exists = queryOne("SELECT id FROM products WHERE barcode=? AND active=1", [code]);
     if (!exists) { if (code) notFound.push(code); continue; }
-    db.run("UPDATE products SET price=?, updated_at=CURRENT_TIMESTAMP WHERE barcode=?", [price, code]);
+    db.run("UPDATE products SET cost=?, price=?, updated_at=CURRENT_TIMESTAMP WHERE barcode=?", [cost, price, code]);
     updated++;
   }
   saveDb();
   res.json({ success: true, updated, notFound: notFound.length });
+});
+
+app.post('/api/import/prices-csv', auth, adminOnly, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Falta archivo CSV' });
+  const content = req.file.buffer.toString('utf8');
+  const lines = content.trim().split('\n');
+  const prices = {};
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split('\t').length > 1 ? lines[i].split('\t') : lines[i].split(',');
+    if (cols.length >= 10) {
+      const code = cols[0].trim();
+      const costStr = cols[7] ? cols[7].toString().replace('.', '').replace(',', '.').trim() : '';
+      const priceStr = cols[9] ? cols[9].toString().replace('.', '').replace(',', '.').trim() : '';
+      const cost = parseFloat(costStr) || 0;
+      const price = parseFloat(priceStr) || 0;
+      if (code && !isNaN(parseInt(code))) {
+        prices[code] = { cost, price };
+      }
+    }
+  }
+  const db = getDb();
+  let updated = 0, notFound = [];
+  for (const code of Object.keys(prices)) {
+    const entry = prices[code];
+    const exists = queryOne("SELECT id FROM products WHERE barcode=? AND active=1", [code]);
+    if (!exists) { if (code) notFound.push(code); continue; }
+    db.run("UPDATE products SET cost=?, price=?, updated_at=CURRENT_TIMESTAMP WHERE barcode=?", [entry.cost, entry.price, code]);
+    updated++;
+  }
+  saveDb();
+  res.json({ success: true, updated, notFound: notFound.length });
+});
+
+app.post('/api/import/products', auth, adminOnly, (req, res) => {
+  const { products } = req.body;
+  if (!products || !products.length) return res.status(400).json({ error: 'Falta lista de productos' });
+  const db = getDb();
+  let added = 0, skipped = [];
+  for (const p of products) {
+    const name = (p.name || '').trim();
+    if (!name) continue;
+    const exists = queryOne("SELECT id FROM products WHERE name=? AND active=1", [name]);
+    if (exists) { skipped.push(name); continue; }
+    db.run("INSERT INTO products (name, description, description1, description2, price, cost, stock, min_stock, max_stock, active) VALUES (?, '', '', ?, ?, ?, ?, ?, ?, 1)", [name, '', parseFloat(p.price)||0, parseFloat(p.cost)||0, parseInt(p.stock)||0, parseInt(p.min_stock)||0, parseInt(p.max_stock)||0]);
+    added++;
+  }
+  saveDb();
+  res.json({ success: true, added, skipped: skipped.length });
 });
 
 // ==================== CLIENTS ====================

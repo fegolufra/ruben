@@ -352,9 +352,9 @@ function goToProductsLowStock() {
 }
 
 // ==================== PRODUCTS ====================
- function viewProducts() {
-   return '<div class="toolbar"><input class="search-input" id="prodSearch" placeholder="Buscar producto..." oninput="searchProducts()"><select id="prodCatFilter" onchange="searchProducts()"><option value="">Todas las categorias</option></select><button class="btn btn-outline" onclick="exportProducts()">Exportar Excel</button><div class="spacer"></div><span id="productsSummary" style="font-weight:600;color:var(--primary-light)"></span><button class="btn btn-primary" onclick="showProductForm()">+ Nuevo Producto</button></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Codigo</th><th>Nombre</th><th>Descripcion 1</th><th>Descripcion 2</th><th>Stock</th><th>Minimo</th><th>Maximo</th><th>Rubro/Familia</th><th>Observaciones</th><th class="text-right">Acciones</th></tr></thead><tbody id="productsTable"></tbody></table></div></div>';
- }
+function viewProducts() {
+    return '<div class="toolbar"><input class="search-input" id="prodSearch" placeholder="Buscar producto..." oninput="searchProducts()"><select id="prodCatFilter" onchange="searchProducts()"><option value="">Todas las categorias</option></select><button class="btn btn-outline" onclick="exportProducts()">Exportar Excel</button><button class="btn btn-outline" onclick="showProductImport()">Importar lista</button><div class="spacer"></div><span id="productsSummary" style="font-weight:600;color:var(--primary-light)"></span><button class="btn btn-primary" onclick="showProductForm()">+ Nuevo Producto</button></div><div class="card"><div class="table-wrap"><table><thead><tr><th>Codigo</th><th>Nombre</th><th>Descripcion 1</th><th>Descripcion 2</th><th>Stock</th><th>Minimo</th><th>Maximo</th><th>Rubro/Familia</th><th>Observaciones</th><th class="text-right">Acciones</th></tr></thead><tbody id="productsTable"></tbody></table></div></div>';
+  }
 
 function initProducts() {
   var cats = [];
