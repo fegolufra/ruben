@@ -1051,10 +1051,10 @@ async function quickSale() {
           var btn = document.getElementById('btnQuickSale');
           btn.disabled = true;
           btn.textContent = 'Procesando...';
-          var items = saleCart.map(function(it) { return { product_id: it.product_id, product_name: it.name, quantity: it.qty, price: it.price, description: [it.description1, it.description2].filter(Boolean).join(' | ') }; });
-          var res = await api('POST', '/sales', { items: items, discount: discountAmount, payment_method: payment, client_id: clientId });
-         btn.disabled = false;
-         if (res && res.success) {
+var items = saleCart.map(function(it) { return { product_id: it.product_id, product_name: it.name, quantity: it.qty, price: it.price, description: [it.description1, it.description2].filter(Boolean).join(' | ') }; });
+           var res = await api('POST', '/sales', { items: items, discount: discountAmount, payment_method: payment, client_id: clientId }).catch(function(e) { return null; });
+          btn.disabled = false;
+          if (res && res.success) {
            closeModal();
            var invMsg = 'Venta registrada exitosamente';
            if (res.invoice) {

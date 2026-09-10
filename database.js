@@ -74,7 +74,7 @@ initUsers();
 
 function initDatabase() {}
 function getDb() { return db; }
-function saveDb() { db.pragma('wal_checkpoint(TRUNCATE)'); }
+function saveDb() { try { db.pragma('wal_checkpoint(TRUNCATE)'); } catch (e) { console.error('saveDb error:', e.message); } }
 function queryAll(sql, params) { return db.prepare(sql).all(params || []); }
 function queryOne(sql, params) { return db.prepare(sql).get(params || []) || null; }
 function lastId() { return db.prepare("SELECT last_insert_rowid() as id").get().id; }
